@@ -22,7 +22,7 @@ fn main() {
         .expect("Method code should be present at the specified path; did you use the correct *_PATH constant?");
     let mut rng = rand::thread_rng();
     loop {
-        let n: usize = rng.gen_range(0..1_000_000) as usize;
+        let n: usize = rng.gen_range(0..10_000_000) as usize;
         let start = Instant::now();
         let opts = ProverOpts::default().with_skip_seal(false);
         let mut prover = Prover::new_with_opts(&method_code, MULTIPLY_ID, opts).expect(
