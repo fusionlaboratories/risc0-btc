@@ -13,9 +13,9 @@ fn main() {
         .expect("Method code should be present at the specified path; did you use the correct *_PATH constant?");
     let mut rng = rand::thread_rng();
     let range = Uniform::new(0, 20);
-    println!("# start");
     loop {
-        let n: usize = rng.gen_range(0..10_000_000) as usize;
+        let n: usize = rng.gen_range(0..100_000) as usize;
+        println!("# {n}");
         let vals: Vec<u8> = vec![0; n].into_iter().map(|_| rng.sample(&range)).collect();
         let start = Instant::now();
         let opts = ProverOpts::default().with_skip_seal(false);
