@@ -9,3 +9,4 @@ methods = { path = "../methods" }
 # risc0-zkvm = { path = "/home/matthias/zk/risc0/risc0/zkvm" }
 risc0-zkvm = { git = "https://github.com/matthiasgoergens/risc0.git", rev = "bc6ba90fa567f613944bcb6d00bb791b439b8f54" }
 serde = "1.0"
+rand = "0.8"

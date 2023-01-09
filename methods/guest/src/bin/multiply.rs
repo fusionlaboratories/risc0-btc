@@ -21,6 +21,6 @@ pub fn main() {
     let initial_input: &'static [u8] = env::send_recv(SENDRECV_CHANNEL_INITIAL_INPUT, &[]);
     // TODO: Implement your guest code here
     let answer = initial_input.len();
-    env::commit(b"hello world");
-    // env::commit(&answer);
+    // env::commit(b"hello world");
+    env::commit(&answer);
 }
