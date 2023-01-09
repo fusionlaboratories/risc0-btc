@@ -3,23 +3,26 @@ use risc0_zkvm::{
     Prover, ProverOpts,
 };
 
-use std::time::{Duration, Instant};
+use std::time::{Instant};
 use rand::Rng;
+use rand::distributions::Uniform;
 
 fn main() {
     // Make the prover.
     let method_code = std::fs::read(MULTIPLY_PATH)
         .expect("Method code should be present at the specified path; did you use the correct *_PATH constant?");
     let mut rng = rand::thread_rng();
+    let range = Uniform::new(0, 20);
     loop {
         let n: usize = rng.gen_range(0..10_000_000) as usize;
+        let vals: Vec<u8> = vec![0; n].into_iter().map(|_| rng.sample(&range)).collect();
         let start = Instant::now();
         let opts = ProverOpts::default().with_skip_seal(false);
         let mut prover = Prover::new_with_opts(&method_code, MULTIPLY_ID, opts).expect(
             "Prover should be constructed from valid method source code and corresponding method ID",
         );
 
-        prover.add_input_u8_slice(&vec![0; n]);
+        prover.add_input_u8_slice(&vals);
 
         // Run prover & generate receipt
         let receipt = prover.run()
