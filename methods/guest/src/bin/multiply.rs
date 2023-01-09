@@ -8,7 +8,7 @@ risc0_zkvm::guest::entry!(main);
 
 pub fn main() {
     let initial_input: &'static [u8] = env::send_recv(SENDRECV_CHANNEL_INITIAL_INPUT, &[]);
-    let answer: u32 = initial_input.iter().map(|x| *x as u32).sum();
+    let answer: u32 = initial_input.iter().map(|&x| x as u32).sum();
     // let answer = initial_input.len();
     env::commit(&answer);
 }
