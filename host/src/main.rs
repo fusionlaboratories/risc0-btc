@@ -23,13 +23,14 @@ fn main() {
     );
 
     // prover.add_input_u32_slice(&to_vec(&MultiTestSpec::ShaDigest { data: msg.into() }).unwrap());
-    prover.   add_input_u32_slice(&[0,1,2]);
+    prover.add_input_u32_slice(&[0,1,2]);
     // TODO: Implement communication with the guest here
     println!("Foo");
 
     // Run prover & generate receipt
-    let _receipt = prover.run()
+    let receipt = prover.run()
         .expect("Code should be provable unless it 1) had an error or 2) overflowed the cycle limit. See `embed_methods_with_options` for information on adjusting maximum cycle count.");
+    println!("{:?}", receipt);
 
     // // Optional: Verify receipt to confirm that recipients will also be able to verify your receipt
     // receipt.verify(MULTIPLY_ID).expect(

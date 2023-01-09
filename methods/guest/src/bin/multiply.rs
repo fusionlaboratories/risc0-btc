@@ -12,7 +12,7 @@
 // use risc0_zkvm_platform::io::SENDRECV_CHANNEL_INITIAL_INPUT;
 use risc0_zkvm::guest::{env};
 use risc0_zkvm_platform::io::SENDRECV_CHANNEL_INITIAL_INPUT;
-use bench::BenchmarkSpec;
+use methods::bench::BenchmarkSpec;
 
 risc0_zkvm::guest::entry!(main);
 
@@ -20,4 +20,7 @@ pub fn main() {
     // NOTE(Matthias): type is just copied from send_recv's definition.
     let initial_input: &'static [u8] = env::send_recv(SENDRECV_CHANNEL_INITIAL_INPUT, &[]);
     // TODO: Implement your guest code here
+    let answer = initial_input.len();
+    env::commit(b"hello world");
+    // env::commit(&answer);
 }
