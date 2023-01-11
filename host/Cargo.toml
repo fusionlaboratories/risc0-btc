@@ -11,3 +11,4 @@ methods = { path = "../methods" }
 risc0-zkvm = { git = "https://github.com/risc0/risc0.git", rev = "094ef539ec2e20989704b440f79b9e473c3f44ca" }
 serde = "1.0"
 rand = "0.8"
+cc = "1.0"
