@@ -18,7 +18,7 @@ fn main() {
         println!("# {n}");
         let vals: Vec<u8> = vec![0; n].into_iter().map(|_| rng.sample(&range)).collect();
         let start = Instant::now();
-        let opts = ProverOpts::default().with_skip_seal(true);
+        let opts = ProverOpts::default().with_skip_seal(false);
         let mut prover = Prover::new_with_opts(&method_code, MULTIPLY_ID, opts).expect(
             "Prover should be constructed from valid method source code and corresponding method ID",
         );
