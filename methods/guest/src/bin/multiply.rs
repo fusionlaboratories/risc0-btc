@@ -1,5 +1,5 @@
 #![no_main]
-#![no_std]  // std support is experimental, but you can remove this to try it
+// #![no_std]  // std support is experimental, but you can remove this to try it
 
 // extern { fn fib(x: i32) -> i32; }
 
@@ -11,20 +11,10 @@ use risc0_zkp::core::sha::Sha;
 
 risc0_zkvm::guest::entry!(main);
 
-// transaction inclusion.
-
-pub fn block() {
-    let initial_input: &'static [u8] = env::send_recv(SENDRECV_CHANNEL_INITIAL_INPUT, &[]);
-    // let initial_input: &[u8] = env::read();
-    // let answer: u32 = initial_input.iter().map(|&x| x as u32).sum();
-    // let answer = sha::hash_bytes(&initial_input[..]);
-    let answer = initial_input.len();
-    // let fanswer: i32 = unsafe { fib(10) };
-    env::commit(&answer);
-}
-
 pub fn main() {
     let buf: &'static [u8] = env::send_recv(SENDRECV_CHANNEL_INITIAL_INPUT, &[]);
+    let v = buf.to_vec();
+    parse_head(&v);
     cfg_if::cfg_if! {
         if #[cfg(target_os = "zkvm")] {
             let shax = sha::Impl {};
@@ -35,4 +25,36 @@ pub fn main() {
             panic!();
         }
     }
+}
+
+use std::io::Read;
+use std::mem;
+use std::slice;
+
+// Not sure this is the best way to read a C-struct,
+// but it works for now.
+pub fn parse_head(v: &Vec<u8>) {
+    let mut buffer: &[u8] = &v.clone();
+    let mut header: Header = unsafe { mem::zeroed() };
+    let header_size = mem::size_of::<Header>();
+    unsafe {
+        let header_slice =
+            slice::from_raw_parts_mut(
+                &mut header as *mut _ as *mut u8,
+                header_size);
+        // `read_exact()` comes from `Read` impl for `&[u8]`
+        buffer.read_exact(header_slice).unwrap();
+    }
+    // println!("{:?}", header);
+}
+
+#[repr(C, packed)]
+#[derive(Debug, Copy, Clone)]
+struct Header {
+    version: u32,
+    previous_hash: [u8; 32],
+    tx_root: [u8; 32],
+    time: u32,
+    target: u32,
+    nonce: u32,
 }

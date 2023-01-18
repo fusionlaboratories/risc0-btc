@@ -4,35 +4,54 @@ use risc0_zkvm::{
 };
 
 use std::time::{Instant};
-use rand::Rng;
-use rand::distributions::Uniform;
+use std::fs;
 
 fn main() {
-    // Make the prover.
-    let method_code = std::fs::read(MULTIPLY_PATH)
-        .expect("Method code should be present at the specified path; did you use the correct *_PATH constant?");
-    let mut rng = rand::thread_rng();
-    let range = Uniform::new(0, 20);
-    loop {
-        let n: usize = rng.gen_range(0..100_000) as usize;
-        println!("# {n}");
-        let vals: Vec<u8> = vec![0; n].into_iter().map(|_| rng.sample(&range)).collect();
-        let start = Instant::now();
-        let opts = ProverOpts::default().with_skip_seal(false);
-        let mut prover = Prover::new_with_opts(&method_code, MULTIPLY_ID, opts).expect(
-            "Prover should be constructed from valid method source code and corresponding method ID",
-        );
+    let head = fs::read("block80.raw").unwrap();
+    parse_head(&head);
 
-        prover.add_input_u8_slice(&vals);
+    let method_code = std::fs::read(MULTIPLY_PATH).unwrap();
+    let start = Instant::now();
+    let opts = ProverOpts::default().with_skip_seal(false);
+    let mut prover = Prover::new_with_opts(&method_code, MULTIPLY_ID, opts).unwrap();
 
-        // Run prover & generate receipt
-        let receipt = prover.run()
-            .expect("Code should be provable unless it 1) had an error or 2) overflowed the cycle limit. See `embed_methods_with_options` for information on adjusting maximum cycle count.");
-        println!("{n} {} # {:?}", start.elapsed().as_secs_f64(), receipt.journal);
-    }
+    prover.add_input_u8_slice(&head);
+
+    let receipt = prover.run().unwrap();
+    println!("{} # {:?}", start.elapsed().as_secs_f64(), receipt.journal);
 
     // // Optional: Verify receipt to confirm that recipients will also be able to verify your receipt
     // receipt.verify(MULTIPLY_ID).expect(
     //     "Code you have proven should successfully verify; did you specify the correct method ID?",
     // );
+}
+
+use std::io::Read;
+use std::mem;
+use std::slice;
+
+pub fn parse_head(v: &Vec<u8>) {
+    let mut buffer: &[u8] = &v.clone();
+    let mut header: Header = unsafe { mem::zeroed() };
+    let header_size = mem::size_of::<Header>();
+    unsafe {
+        let header_slice =
+            slice::from_raw_parts_mut(
+                &mut header as *mut _ as *mut u8,
+                header_size);
+        // `read_exact()` comes from `Read` impl for `&[u8]`
+        buffer.read_exact(header_slice).unwrap();
+    }
+    println!("{:?}", header);
+}
+
+#[repr(C, packed)]
+#[derive(Debug, Copy, Clone)]
+struct Header {
+    version: u32,
+    previous_hash: [u8; 32],
+    tx_root: [u8; 32],
+    time: u32,
+    target: u32,
+    nonce: u32,
 }
