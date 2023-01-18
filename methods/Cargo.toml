@@ -15,4 +15,3 @@ methods = ["guest"]
 [dependencies]
 bytemuck = "1.12"
 serde = { version = "1.0", default-features = false, features = ["derive"] }
-cc = "1.0"

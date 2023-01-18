@@ -14,10 +14,11 @@ risc0-zkvm-platform = { git = "https://github.com/risc0/risc0.git", rev = "094ef
 risc0-zkp = { git = "https://github.com/risc0/risc0.git", rev = "094ef539ec2e20989704b440f79b9e473c3f44ca", default-features = false }
 methods = { path = "../", default-features = false }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
+cfg-if = "1.0"
 
-
-# NOTE(Matthias): this section copied from the password checker example.
-# Not sure whether it's useful.
-[profile.release]
-lto = true
-opt-level = "z"
+# # NOTE(Matthias): this section copied from the password checker example.
+# # Not sure whether it's useful.
+# [profile.release]
+# lto = true
+# opt-level = "z"
+# # Those seem to make the whole thing much slower to compile.

@@ -11,7 +11,9 @@ use risc0_zkp::core::sha::Sha;
 
 risc0_zkvm::guest::entry!(main);
 
-pub fn foo() {
+// transaction inclusion.
+
+pub fn block() {
     let initial_input: &'static [u8] = env::send_recv(SENDRECV_CHANNEL_INITIAL_INPUT, &[]);
     // let initial_input: &[u8] = env::read();
     // let answer: u32 = initial_input.iter().map(|&x| x as u32).sum();
@@ -23,6 +25,12 @@ pub fn foo() {
 
 pub fn main() {
     let buf: &'static [u8] = env::send_recv(SENDRECV_CHANNEL_INITIAL_INPUT, &[]);
-    let shax = sha::Impl {};
-    env::commit(&shax.hash_bytes(&buf).as_bytes());
+    cfg_if::cfg_if! {
+        if #[cfg(target_os = "zkvm")] {
+            let shax = sha::Impl {};
+            env::commit(&shax.hash_bytes(&buf).as_bytes());
+        } else {
+            panic!();
+        }
+    }
 }
