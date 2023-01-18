@@ -28,7 +28,9 @@ pub fn main() {
     cfg_if::cfg_if! {
         if #[cfg(target_os = "zkvm")] {
             let shax = sha::Impl {};
-            env::commit(&shax.hash_bytes(&buf).as_bytes());
+            let dig = shax.hash_bytes(&buf).as_bytes();
+            let dig2 = shax.hash_bytes(&dig).as_bytes();
+            env::commit(&dig2);
         } else {
             panic!();
         }
